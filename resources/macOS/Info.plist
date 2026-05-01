@@ -23,7 +23,14 @@
 <key>NSPrincipalClass</key>
 <string>NSApplication</string>
 <key>NSSupportsAutomaticGraphicsSwitching</key>
-<true/><key>NOTE</key>
+<true/>
+<key>NSCameraUsageDescription</key>
+<string>MapMap uses the camera as a live video source for projection mapping.</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>MapMap uses the microphone for audio input from camera devices.</string>
+<key>NSAppleEventsUsageDescription</key>
+<string>MapMap uses Apple Events to control display arrangement during projection.</string>
+<key>NOTE</key>
 <string>This file need to be update at every release</string>
 
 </dict>
