@@ -5,6 +5,11 @@
 Debug/
 Release/
 
+# Build artefacts
+dist/
+build/
+build-*/
+
 # Generated
 *.la
 *.lo

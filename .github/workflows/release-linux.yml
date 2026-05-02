@@ -1,0 +1,65 @@
+name: Linux .deb
+
+on:
+  push:
+    branches: [dev, master]
+    tags:     ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: linux-deb-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build + package .deb
+        run: |
+          ./scripts/build-linux.sh --deb
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mapmap-deb
+          path: dist/*.deb
+
+      - name: Publish "latest" prerelease (dev/master pushes)
+        if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/master'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Linux build"
+          prerelease: true
+          body: |
+            Continuous Linux .deb built from `${{ github.ref_name }}`.
+
+            Install on Debian/Ubuntu:
+            ```
+            curl -L -O https://github.com/${{ github.repository }}/releases/download/latest/$(ls dist | head -1)
+            sudo dpkg -i *.deb
+            sudo apt-get install -f
+            ```
+          files: dist/*.deb
+          fail_on_unmatched_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish tagged release (v* tags)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
